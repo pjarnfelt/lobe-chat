@@ -2,6 +2,10 @@
 
 This document serves as a comprehensive guide for all team members when developing LobeChat.
 
+## Project Description
+
+You are developing an open-source, modern-design AI Agent Workspace: LobeHub(previous LobeChat).
+
 ## Tech Stack
 
 Built with modern technologies:
@@ -22,6 +26,7 @@ The project follows a well-organized monorepo structure:
 - `src/` - Main source code
 - `docs/` - Documentation
 - `.cursor/rules/` - Development rules and guidelines
+- PR titles starting with `✨ feat/` or `🐛 fix` will trigger the release workflow upon merge. Only use these prefixes for significant user-facing feature changes or bug fixes
 
 ## Development Workflow
 
@@ -79,7 +84,7 @@ All following rules are saved under `.cursor/rules/` directory:
 
 ### Frontend
 
-- `react-component.mdc` – React component style guide and conventions
+- `react.mdc` – React component style guide and conventions
 - `i18n.mdc` – Internationalization guide using react-i18next
 - `typescript.mdc` – TypeScript code style guide
 - `packages/react-layout-kit.mdc` – Usage guide for react-layout-kit

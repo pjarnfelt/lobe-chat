@@ -80,6 +80,7 @@ export class UserModel {
         settingsImage: userSettings.image,
         settingsKeyVaults: userSettings.keyVaults,
         settingsLanguageModel: userSettings.languageModel,
+        settingsMarket: userSettings.market,
         settingsSystemAgent: userSettings.systemAgent,
         settingsTTS: userSettings.tts,
         settingsTool: userSettings.tool,
@@ -112,6 +113,7 @@ export class UserModel {
       image: state.settingsImage || {},
       keyVaults: decryptKeyVaults,
       languageModel: state.settingsLanguageModel || {},
+      market: state.settingsMarket || undefined,
       systemAgent: state.settingsSystemAgent || {},
       tool: state.settingsTool || {},
       tts: state.settingsTTS || {},
@@ -147,9 +149,11 @@ export class UserModel {
   };
 
   updateUser = async (value: Partial<UserItem>) => {
+    const nextValue = UserModel.normalizeUniqueUserFields(value);
+
     return this.db
       .update(users)
-      .set({ ...value, updatedAt: new Date() })
+      .set({ ...nextValue, updatedAt: new Date() })
       .where(eq(users.id, this.userId));
   };
 
@@ -191,6 +195,31 @@ export class UserModel {
       .where(eq(users.id, this.userId));
   };
 
+  /**
+   * Normalize unique user fields so empty strings become null, keeping unique constraints safe.
+   */
+  private static normalizeUniqueUserFields = <
+    T extends { email?: string | null; phone?: string | null; username?: string | null },
+  >(
+    value: T,
+  ) => {
+    const normalizedEmail =
+      typeof value.email === 'string' && value.email.trim() === '' ? null : value.email;
+    const normalizedPhone =
+      typeof value.phone === 'string' && value.phone.trim() === '' ? null : value.phone;
+    const normalizedUsername =
+      typeof value.username === 'string' && value.username.trim() === ''
+        ? null
+        : value.username?.trim();
+
+    return {
+      ...value,
+      ...(value.email !== undefined ? { email: normalizedEmail } : {}),
+      ...(value.phone !== undefined ? { phone: normalizedPhone } : {}),
+      ...(value.username !== undefined ? { username: normalizedUsername } : {}),
+    };
+  };
+
   // Static method
   static makeSureUserExist = async (db: LobeChatDatabase, userId: string) => {
     await db.insert(users).values({ id: userId }).onConflictDoNothing();
@@ -203,10 +232,8 @@ export class UserModel {
       if (!!user) return { duplicate: true };
     }
 
-    const [user] = await db
-      .insert(users)
-      .values({ ...params })
-      .returning();
+    const normalizedParams = this.normalizeUniqueUserFields(params);
+    const [user] = await db.insert(users).values(normalizedParams).returning();
 
     return { duplicate: false, user };
   };
@@ -217,6 +244,13 @@ export class UserModel {
 
   static findById = async (db: LobeChatDatabase, id: string) => {
     return db.query.users.findFirst({ where: eq(users.id, id) });
+  };
+
+  static findByUsername = async (db: LobeChatDatabase, username: string) => {
+    const normalizedUsername = username.trim();
+    if (!normalizedUsername) return null;
+
+    return db.query.users.findFirst({ where: eq(users.username, normalizedUsername) });
   };
 
   static findByEmail = async (db: LobeChatDatabase, email: string) => {
