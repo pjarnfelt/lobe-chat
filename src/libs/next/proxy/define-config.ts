@@ -8,7 +8,7 @@ import { auth } from '@/auth';
 import { LOBE_LOCALE_COOKIE } from '@/const/locale';
 import { isDesktop } from '@/const/version';
 import { appEnv } from '@/envs/app';
-import { OAUTH_AUTHORIZED , authEnv } from '@/envs/auth';
+import { OAUTH_AUTHORIZED, authEnv } from '@/envs/auth';
 import NextAuth from '@/libs/next-auth';
 import { type Locales } from '@/locales/resources';
 import { parseBrowserLanguage } from '@/utils/locale';
@@ -107,6 +107,7 @@ export function defineConfig() {
       '/me',
       '/desktop-onboarding',
       '/onboarding',
+      '/share',
     ];
     const isSpaRoute = spaRoutes.some((route) => url.pathname.startsWith(route));
 
@@ -184,6 +185,8 @@ export function defineConfig() {
     '/oidc/token',
     // market
     '/market-auth-callback',
+    // public share pages
+    '/share(.*)',
   ]);
 
   const isProtectedRoute = createRouteMatcher([
@@ -234,9 +237,8 @@ export function defineConfig() {
       // ref: https://authjs.dev/getting-started/session-management/protecting
       if (isProtected) {
         logNextAuth('Request a protected route, redirecting to sign-in page');
-        const authUrl = authEnv.NEXT_PUBLIC_AUTH_URL;
-        const callbackUrl = `${authUrl}${req.nextUrl.pathname}${req.nextUrl.search}`;
-        const nextLoginUrl = new URL('/next-auth/signin', authUrl);
+        const callbackUrl = `${appEnv.APP_URL}${req.nextUrl.pathname}${req.nextUrl.search}`;
+        const nextLoginUrl = new URL('/next-auth/signin', appEnv.APP_URL);
         nextLoginUrl.searchParams.set('callbackUrl', callbackUrl);
         const hl = req.nextUrl.searchParams.get('hl');
         if (hl) {
@@ -322,9 +324,8 @@ export function defineConfig() {
       // If request a protected route, redirect to sign-in page
       if (isProtected) {
         logBetterAuth('Request a protected route, redirecting to sign-in page');
-        const authUrl = authEnv.NEXT_PUBLIC_AUTH_URL;
-        const callbackUrl = `${authUrl}${req.nextUrl.pathname}${req.nextUrl.search}`;
-        const signInUrl = new URL('/signin', authUrl);
+        const callbackUrl = `${appEnv.APP_URL}${req.nextUrl.pathname}${req.nextUrl.search}`;
+        const signInUrl = new URL('/signin', appEnv.APP_URL);
         signInUrl.searchParams.set('callbackUrl', callbackUrl);
         const hl = req.nextUrl.searchParams.get('hl');
         if (hl) {

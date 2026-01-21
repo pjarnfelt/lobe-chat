@@ -4,10 +4,10 @@ import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useUserStore } from '@/store/user';
-import { labPreferSelectors } from '@/store/user/slices/preference/selectors';
+import { labPreferSelectors } from '@/store/user/selectors';
 
 import EditorCanvas from './EditorCanvas';
-import TextareCanvas from './TextareCanvas';
+import TextareCanvas from './TextArea';
 
 interface EditorModalProps extends ModalProps {
   onConfirm?: (value: string) => Promise<void>;

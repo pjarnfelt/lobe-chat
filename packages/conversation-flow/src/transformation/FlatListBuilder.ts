@@ -31,8 +31,20 @@ export class FlatListBuilder {
     const flatList: Message[] = [];
     const processedIds = new Set<string>();
 
+    // Determine the root parentId
+    // Normal case: start from null (messages with no parentId)
+    // Orphan case: if all messages have parentId (thread mode), use first message as root
+    let rootParentId: string | null = null;
+
+    const hasRootMessages = this.childrenMap.has(null) && this.childrenMap.get(null)!.length > 0;
+    if (!hasRootMessages && messages.length > 0) {
+      // All messages have parentId - this is orphan/thread mode
+      // Use the first message's parentId as the virtual root
+      rootParentId = messages[0].parentId ?? null;
+    }
+
     // Build the active path by traversing from root
-    this.buildFlatListRecursive(null, flatList, processedIds, messages);
+    this.buildFlatListRecursive(rootParentId, flatList, processedIds, messages);
 
     return flatList;
   }
@@ -644,6 +656,7 @@ export class FlatListBuilder {
               id: toolMsg.id,
             };
             if (toolMsg.error) result.error = toolMsg.error;
+            if (toolMsg.pluginError) result.error = toolMsg.pluginError;
             if (toolMsg.pluginState) result.state = toolMsg.pluginState;
 
             const toolWithResult: ChatToolPayloadWithResult = {

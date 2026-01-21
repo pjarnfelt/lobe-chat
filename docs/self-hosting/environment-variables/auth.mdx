@@ -34,13 +34,6 @@ LobeChat provides a complete authentication service capability when deployed. Th
 - Default: `-`
 - Example: `Tfhi2t2pelSMEA8eaV61KaqPNEndFFdMIxDaJnS1CUI=`
 
-#### `NEXT_PUBLIC_AUTH_URL`
-
-- Type: Optional
-- Description: The URL accessible from the browser for Better Auth callbacks. Only set this if the default generated URL is incorrect.
-- Default: `-`
-- Example: `https://example.com`
-
 #### `NEXT_PUBLIC_AUTH_EMAIL_VERIFICATION`
 
 - Type: Optional
@@ -62,6 +55,13 @@ LobeChat provides a complete authentication service capability when deployed. Th
 - Default: `-`
 
 <OIDCJWKs />
+
+#### `INTERNAL_JWT_EXPIRATION`
+
+- Type: Optional
+- Description: Expiration time for internal JWT tokens used in lambda → async calls. Format: number followed by unit (s=seconds, m=minutes, h=hours). Should be as short as possible for security, but long enough to account for network latency and server processing time.
+- Default: `30s`
+- Example: `30s`, `1m`, `1h`
 
 ### Email Service (SMTP)
 
