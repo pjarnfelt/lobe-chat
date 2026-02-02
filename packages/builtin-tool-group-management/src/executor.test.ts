@@ -75,6 +75,7 @@ describe('GroupManagementExecutor', () => {
           triggerBroadcast: vi.fn(),
           triggerDelegate: vi.fn(),
           triggerExecuteTask: vi.fn(),
+          triggerExecuteTasks: vi.fn(),
           triggerSpeak,
         },
         'supervisor-agent',
@@ -122,6 +123,7 @@ describe('GroupManagementExecutor', () => {
           triggerBroadcast: vi.fn(),
           triggerDelegate: vi.fn(),
           triggerExecuteTask: vi.fn(),
+          triggerExecuteTasks: vi.fn(),
           triggerSpeak,
         },
         'supervisor-agent',
@@ -171,6 +173,7 @@ describe('GroupManagementExecutor', () => {
           triggerBroadcast,
           triggerDelegate: vi.fn(),
           triggerExecuteTask: vi.fn(),
+          triggerExecuteTasks: vi.fn(),
           triggerSpeak: vi.fn(),
         },
         'supervisor-agent',
@@ -238,6 +241,7 @@ describe('GroupManagementExecutor', () => {
           triggerBroadcast: vi.fn(),
           triggerDelegate,
           triggerExecuteTask: vi.fn(),
+          triggerExecuteTasks: vi.fn(),
           triggerSpeak: vi.fn(),
         },
         'supervisor-agent',
@@ -280,7 +284,7 @@ describe('GroupManagementExecutor', () => {
       const ctx = createMockContext();
 
       const result = await groupManagementExecutor.executeAgentTask(
-        { agentId: 'agent-1', task: 'Do something', title: 'Test Task' },
+        { agentId: 'agent-1', instruction: 'Do something', title: 'Test Task' },
         ctx,
       );
 
@@ -289,9 +293,8 @@ describe('GroupManagementExecutor', () => {
       expect(result.content).toBe('Triggered async task for agent "agent-1".');
       expect(result.state).toEqual({
         agentId: 'agent-1',
-        task: 'Do something',
+        instruction: 'Do something',
         timeout: undefined,
-        title: 'Test Task',
         type: 'executeAgentTask',
       });
     });
@@ -308,6 +311,7 @@ describe('GroupManagementExecutor', () => {
           triggerBroadcast: vi.fn(),
           triggerDelegate: vi.fn(),
           triggerExecuteTask,
+          triggerExecuteTasks: vi.fn(),
           triggerSpeak: vi.fn(),
         },
         'supervisor-agent',
@@ -315,7 +319,7 @@ describe('GroupManagementExecutor', () => {
       );
 
       await groupManagementExecutor.executeAgentTask(
-        { agentId: 'agent-1', task: 'Do something', timeout: 30000, title: 'Test Task' },
+        { agentId: 'agent-1', instruction: 'Do something', timeout: 30000, title: 'Test Task' },
         ctx,
       );
 
@@ -329,8 +333,8 @@ describe('GroupManagementExecutor', () => {
       // Now triggerExecuteTask should have been called
       expect(triggerExecuteTask).toHaveBeenCalledWith({
         agentId: 'agent-1',
+        instruction: 'Do something',
         supervisorAgentId: 'supervisor-agent',
-        task: 'Do something',
         timeout: 30000,
         toolMessageId: 'test-message-id',
       });
@@ -340,7 +344,7 @@ describe('GroupManagementExecutor', () => {
       const ctx = createMockContext();
 
       const result = await groupManagementExecutor.executeAgentTask(
-        { agentId: 'agent-1', task: 'Do something', title: 'Test Task' },
+        { agentId: 'agent-1', instruction: 'Do something', title: 'Test Task' },
         ctx,
       );
 
@@ -352,16 +356,15 @@ describe('GroupManagementExecutor', () => {
       const ctx = createMockContext();
 
       const result = await groupManagementExecutor.executeAgentTask(
-        { agentId: 'agent-1', task: 'Do something', timeout: 60000, title: 'Test Task' },
+        { agentId: 'agent-1', instruction: 'Do something', timeout: 60000, title: 'Test Task' },
         ctx,
       );
 
       expect(result.success).toBe(true);
       expect(result.state).toEqual({
         agentId: 'agent-1',
-        task: 'Do something',
+        instruction: 'Do something',
         timeout: 60000,
-        title: 'Test Task',
         type: 'executeAgentTask',
       });
     });

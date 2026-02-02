@@ -1,5 +1,6 @@
 import type { BuiltinToolManifest } from '@lobechat/types';
 
+import { isDesktop } from './const';
 import { systemPrompt } from './systemRole';
 import { GroupManagementApiName } from './types';
 
@@ -99,11 +100,18 @@ export const GroupManagementManifest: BuiltinToolManifest = {
             description: 'Brief title describing what this task does (shown in UI).',
             type: 'string',
           },
-          task: {
+          instruction: {
             description:
-              'Clear description of the task to perform. Be specific about expected deliverables.',
+              'Clear instruction describing the task to perform. Be specific about expected deliverables.',
             type: 'string',
           },
+          ...(isDesktop && {
+            runInClient: {
+              description:
+                'Whether to run on the desktop client (for local file/shell access). MUST be true when task requires local-system tools. Default is false (server execution).',
+              type: 'boolean',
+            },
+          }),
           timeout: {
             default: 1_800_000,
             description:
@@ -117,7 +125,7 @@ export const GroupManagementManifest: BuiltinToolManifest = {
             type: 'boolean',
           },
         },
-        required: ['agentId', 'title', 'task'],
+        required: ['agentId', 'title', 'instruction'],
         type: 'object',
       },
     },
@@ -142,7 +150,7 @@ export const GroupManagementManifest: BuiltinToolManifest = {
                 },
                 instruction: {
                   description:
-                    'Detailed instruction/prompt for the task execution. Be specific about expected deliverables.',
+                    'Detailed instruction for the agent to execute. Be specific about expected deliverables.',
                   type: 'string',
                 },
                 timeout: {
@@ -167,22 +175,22 @@ export const GroupManagementManifest: BuiltinToolManifest = {
         type: 'object',
       },
     },
-    {
-      description:
-        'Interrupt a running agent task. Use this to stop a task that is taking too long or is no longer needed.',
-      humanIntervention: 'always',
-      name: GroupManagementApiName.interrupt,
-      parameters: {
-        properties: {
-          taskId: {
-            description: 'The ID of the task to interrupt (returned by executeTask).',
-            type: 'string',
-          },
-        },
-        required: ['taskId'],
-        type: 'object',
-      },
-    },
+    // {
+    //   description:
+    //     'Interrupt a running agent task. Use this to stop a task that is taking too long or is no longer needed.',
+    //   humanIntervention: 'always',
+    //   name: GroupManagementApiName.interrupt,
+    //   parameters: {
+    //     properties: {
+    //       taskId: {
+    //         description: 'The ID of the task to interrupt (returned by executeTask).',
+    //         type: 'string',
+    //       },
+    //     },
+    //     required: ['taskId'],
+    //     type: 'object',
+    //   },
+    // },
 
     // ==================== Context Management ====================
     // {
